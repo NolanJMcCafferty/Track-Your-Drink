@@ -1,0 +1,96 @@
+//  FirstViewController.swift
+//  Track Your Drank
+//
+//  Created by Nolan McCafferty on 11/10/17.
+//  Copyright © 2017 Nolan McCafferty. All rights reserved.
+//
+
+import UIKit
+
+class ViewController: UIViewController,  UITextFieldDelegate {
+    
+    var drinks: Double = 0.0;
+    @IBOutlet weak var bacLabel: UILabel!
+    @IBOutlet weak var weightField: UITextField!
+    var r: Double = 0.73;
+    var H = 0;
+    @IBOutlet weak var noDrive: UILabel!
+    
+    @IBOutlet weak var drinkLabel: UILabel!
+    
+    @IBOutlet weak var gender: UISegmentedControl!
+    
+    @IBAction func genderChange(_ sender: Any) {
+        if gender.selectedSegmentIndex == 0 {
+            r = 0.73;
+        } else if gender.selectedSegmentIndex == 1 {
+            r = 0.66;
+        }
+        drinks = drinks - 1;
+        calcBAC();
+    }
+    
+    @IBAction func drinkButn(_ sender: Any) {
+        calcBAC();
+    }
+    
+    
+    func calcBAC() {
+        if (weightField.text == nil) {
+            bacLabel.text = "Enter your weight";
+        } else if (Double(weightField.text!) == nil) {
+            bacLabel.text = "Invalid weight";
+        } else if (weightField.text == " ") {
+            bacLabel.text = String(0.0)+"%";
+        } else {
+            drinks = drinks + 1.0;
+            let weight = Double(weightField.text!);
+            
+            //bac formula based on Widmark's Formula
+            var bac: Double = drinks*0.6*5.14/(weight!*r) - 0.15*Double(H);
+            bac = Double(round(1000*bac)/1000);
+            if (bac > 0.08) {
+                noDrive.text = "You Can't Drive!";
+            } else {
+                noDrive.text = "";
+            }
+            bacLabel.text = "Your BAC is "+String(bac)+"%";
+            drinkLabel.text = "Drinks: "+String(" "+String(Int(drinks)));
+        }
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        weightField.resignFirstResponder()
+        return true
+    }
+    
+    @IBAction func restart(_ sender: Any) {
+        drinks = 0;
+        drinkLabel.text = "Drinks: 0";
+        bacLabel.text = "Your BAC is 0.0%";
+        weightField.text = "";
+        noDrive.text = "";
+    }
+
+    private func textFieldShouldReturn(textField: UITextField!) -> Bool
+    {
+        view.endEditing(true)
+        return false
+    }
+    
+    
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        // Do any additional setup after loading the view, typically from a nib.
+    }
+    
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    
+    
+}
+
